@@ -6,18 +6,26 @@
 #########################################
 import random
 import pygame
+
+
 pygame.init()
 import time
 from math import sqrt                   # only sqrt function is needed from the math module
 from random import randint              # only randint function is needed from the random module
 gameover=False
+
+balIMG = pygame.image.load("ball.png")
+balIMG = pygame.transform.scale(balIMG,(70,70))
+
+#ballDict = {1:balIMG,2:}
+
 miss = 0
 popped = 0
 # Game window
 HEIGHT = 600
 WIDTH  = 800
 game_window = pygame.display.set_mode((WIDTH,HEIGHT))
-pic1= pygame.image.load("ptb.jpg")                    # Image properties
+pic1= pygame.image.load("ptb.png")                    # Image properties
 pic1= pic1.convert_alpha()                           #
 pic1X = 0
 pic1Y = 0
@@ -51,7 +59,8 @@ def redraw_game_window():
     else:
         for i in range(20):
             if visible[i] == True:
-                pygame.draw.circle(game_window, balloonCLR[i], (balloonX[i], balloonY[i]), balloonR[i], outline)
+               # pygame.draw.circle(game_window, balloonCLR[i], (balloonX[i], balloonY[i]), balloonR[i], outline)
+                game_window.blit(balIMG,(balloonX[i],balloonY[i]))
             endTime = time.time()             #
             elapseTime = endTime - startTime  # Calculating the elapse time
             elapseTime = int(elapseTime)      #
@@ -115,22 +124,21 @@ while not exit_flag:                    #
         if event.type == pygame.MOUSEBUTTONDOWN:
             for i in range(20):
                 (cursorX,cursorY)=pygame.mouse.get_pos()
-                if distance(cursorX, cursorY, balloonX[i], balloonY[i])< balloonR[i]:
+                if distance(cursorX, cursorY, balloonX[i], balloonY[i])< balloonR[i] and visible[i] :
                     visible[i] = False       # makes the balloon not visible
-                    balloonY[i] = 99999
-                    balloonY[i] = balloonY[i]
+                 #   balloonY[i] = 99999
                     game_window.fill(BLACK)
                     game_window.blit(pic1, (pic1X, pic1Y))
                     popped += 1              # adds 1 to score for each balloon popped
                     print(popped)
     # move the balloons
     for i in range(20):
-        balloonY[i] = balloonY[i] - balloonSPEED[i]  # changes the direction of the balloon to move it
-        if balloonY[i] < 0:                          #   checks if the balloon passed 0 to count as a miss
-            balloonY[i] = balloonY[i]                #   keeps the invisible balloon in the same place
-            miss += 1                                #   counts if the balloon missed
-            balloonY[i] = 99999                      #   puts the hitbox of the balloon at 99999 so it can not be pressed by accident
-            balloonY[i] = balloonY[i]                #   keeps it stationary
+        if visible[i]:
+            balloonY[i] = balloonY[i] - balloonSPEED[i]  # changes the direction of the balloon to move it
+            if balloonY[i] < 0 :                          #   checks if the balloon passed 0 to count as a miss
+                visible[i] = False
+                miss += 1                                #   counts if the balloon missed
+          #  balloonY[i] = 99999                      #   puts the hitbox of the balloon at 99999 so it can not be pressed by accident
     if popped + miss == 20:
         if gameover == False:
             endTime = time.time()               #
